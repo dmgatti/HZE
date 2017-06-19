@@ -4,7 +4,7 @@
 #' Performs association mapping in multiparent mouse populations.
 #' @export
 
-GRSDbinom.fast = function(obj, pheno, pheno.col, addcovar, tx, sanger.dir = "~/Desktop/R/QTL/WD/HS.sanger.files/") {
+GRSDbinom.fast = function(obj, pheno, pheno.col, addcovar, intcovar, tx, sanger.dir = "~/Desktop/R/QTL/WD/HS.sanger.files/") {
         chr = obj$markers[1,2]
 
         setwd(outdir)
@@ -39,14 +39,30 @@ GRSDbinom.fast = function(obj, pheno, pheno.col, addcovar, tx, sanger.dir = "~/D
                 sdps.to.use = which(rowSums(cur.alleles) > 1.0)
 
                 # Run the model at each unique SDP.
-                for(j in sdps.to.use) {
-
+                # Additive model.
+                if(missing(intcovar)) {
+                    for(j in sdps.to.use) {
 
                         full.mod = glm(pheno[,pheno.col] ~ addcovar + cur.alleles[j,], family = binomial(logit))
                         #full.mod = glm(trait ~ addcovar + cur.alleles[j,], family = poisson(link = "log"))
                         cur.ll[j] = logLik(full.mod)
 
-                } # for(j)
+                    } # for(j)
+                } else {
+                    
+                    # In this case, the null model is the model with just the additive covariates.
+                    null.mod = glm(pheno[,pheno.col] ~ addcovar, family = binomial(logit))
+                    null.ll = logLik(null.mod)
+                        
+                    for(j in sdps.to.use) {
+
+                        full.mod = glm(pheno[,pheno.col] ~ addcovar + intcovar * cur.alleles[j,], 
+                                       family = binomial(logit))
+                        #full.mod = glm(trait ~ addcovar + cur.alleles[j,], family = poisson(link = "log"))
+                        cur.ll[j] = logLik(full.mod)
+
+                    } # for(j)
+                } # else
 
                 # This is the LRS.
                 cur.ll = cur.ll - null.ll
@@ -89,7 +105,11 @@ GRSDbinom.fast = function(obj, pheno, pheno.col, addcovar, tx, sanger.dir = "~/D
         } # if(length(snp.rng) > 0)
 
         # Convert LRS to p-values using the chi-squared distribution.
-        pv = pchisq(2 * pv, df = 1, lower.tail = FALSE)
+        df = ncol(addcovar)
+        if(!missing(intcovar)) {
+            df = ncol(addcovar) + ncol(intcovar) * ncol(obj$probs)
+        } # if(!missing(intcovar))
+        pv = pchisq(2 * pv, df = df, lower.tail = FALSE)
         pv = data.frame(sanger.hdr, pv, stringsAsFactors = FALSE)
 
         save(pv, file = paste0(file.prefix, "_chr", chr, ".Rdata"))
