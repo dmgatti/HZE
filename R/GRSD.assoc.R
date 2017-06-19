@@ -1,5 +1,6 @@
 #' @title Genome wide association mapping for binary phenotypes.
 #' @author Elijah F Edmondson, \email{elijah.edmondson@@gmail.com}
+#' @author Daniel M Gatti, \email{dan.gatti@@jax.org}
 #' @details Dec. 29, 2015
 #' @param pheno: data.frame containing phenotypes in columns and samples in
 #'                   rows. Rownames must contain sample IDs.
@@ -11,15 +12,18 @@
 #' @param K: List of kinship matrices, one per chromosome in markers.
 #' @param addcovar: data.frame of additive covariates to use in the mapping.
 #'                      Sample IDs must be in rownames.
+#' @param addcovar: data.frame of interactive covariate to use in the mapping.
+#'                  This will add a term for covariate X genotype interaction to the 
+#'                  mapping model. Sample IDs must be in rownames.
 #' @param markers: data.frame containing at least 3 columns with marker names,
 #'                     chr, Mb postion.
 #' @param snp.file: character string containing the full path to the Sanger
 #'                      SNP file containing genomic positions and SNPs. This file
 #'                      is created using condense.sanger.snps().
 #' @export
+# DMG: 6/19/2017: Adding support for interactive covariates.
 
-
-GRSD.assoc = function(pheno, pheno.col, probs, K, addcovar, markers, snp.file,
+GRSD.assoc = function(pheno, pheno.col, probs, K, addcovar, intcovar, markers, snp.file,
                       outdir = "~/Desktop/", tx = c("Gamma", "HZE", "Unirradiated", "All"),
                       sanger.dir = "~/Desktop/R/QTL/WD/HS.sanger.files/"){
         begin <- Sys.time()
@@ -28,15 +32,19 @@ GRSD.assoc = function(pheno, pheno.col, probs, K, addcovar, markers, snp.file,
 
         samples = intersect(rownames(pheno), rownames(probs))
         samples = intersect(samples, rownames(addcovar))
+        if(!missing(intcovar)) {
+            samples = intersect(samples, rownames(intcovar))
+        }
         samples = intersect(samples, rownames(K[[1]]))
         stopifnot(length(samples) > 0)
         print(paste("A total of", length(samples), tx, "samples are complete."))
 
         pheno = pheno[samples,,drop = FALSE]
         addcovar = addcovar[samples,,drop = FALSE]
+        if(!missing(intcovar)) {
+            intcovar = intcovar[samples,,drop = FALSE]
+        }
         probs = probs[samples,,,drop = FALSE]
-
-
 
         # DEFINE TRAIT #
 
