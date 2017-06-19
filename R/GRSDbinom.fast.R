@@ -17,6 +17,7 @@ GRSDbinom.fast = function(obj, pheno, pheno.col, addcovar, intcovar, tx, sanger.
 
         load(file = paste0(sanger.dir, chr, ".Rdata"))
 
+        # Null model.
         null.mod = glm(pheno[,pheno.col] ~ addcovar, family = binomial(logit))
         #null.mod = glm(trait ~ addcovar, family = poisson(link = "log"))
         null.ll = logLik(null.mod)
@@ -50,10 +51,6 @@ GRSDbinom.fast = function(obj, pheno, pheno.col, addcovar, intcovar, tx, sanger.
                     } # for(j)
                 } else {
                     
-                    # In this case, the null model is the model with just the additive covariates.
-                    null.mod = glm(pheno[,pheno.col] ~ addcovar, family = binomial(logit))
-                    null.ll = logLik(null.mod)
-                        
                     for(j in sdps.to.use) {
 
                         full.mod = glm(pheno[,pheno.col] ~ addcovar + intcovar * cur.alleles[j,], 
