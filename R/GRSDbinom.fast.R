@@ -17,7 +17,7 @@ GRSDbinom.fast = function(obj, pheno, pheno.col, addcovar, intcovar, tx, sanger.
 
         load(file = paste0(sanger.dir, chr, ".Rdata"))
 
-        # Null model.
+        # Null model for additive scans.
         null.mod = glm(pheno[,pheno.col] ~ addcovar, family = binomial(logit))
         #null.mod = glm(trait ~ addcovar, family = poisson(link = "log"))
         null.ll = logLik(null.mod)
@@ -25,6 +25,7 @@ GRSDbinom.fast = function(obj, pheno, pheno.col, addcovar, intcovar, tx, sanger.
 
         glm.fxn = function(snp.rng, local.probs) {
 
+                # Get the SDPs, unique SDPs and SNP locations of each SDP.
                 sdp.nums = sanger[snp.rng,] %*% 2^(7:0)
                 sdps2keep = which(!duplicated(sdp.nums))
                 cur.sdps = sanger[snp.rng,,drop = FALSE][sdps2keep,,drop = FALSE]
@@ -42,6 +43,7 @@ GRSDbinom.fast = function(obj, pheno, pheno.col, addcovar, intcovar, tx, sanger.
                 # Run the model at each unique SDP.
                 # Additive model.
                 if(missing(intcovar)) {
+
                     for(j in sdps.to.use) {
 
                         full.mod = glm(pheno[,pheno.col] ~ addcovar + cur.alleles[j,], family = binomial(logit))
@@ -49,20 +51,35 @@ GRSDbinom.fast = function(obj, pheno, pheno.col, addcovar, intcovar, tx, sanger.
                         cur.ll[j] = logLik(full.mod)
 
                     } # for(j)
+                        
+                    # This is the LRS.
+                    cur.ll = cur.ll - null.ll
+
                 } else {
-                    
+
+                    # Interactive model.
+                    intcovar.mat = model.matrix(~intcovar)[,-1]
+                    n.inter = ncol(intcovar)
+                    # Create a matrix with the interactive covariates spread out, one per founder.
+                    intcovar.mat = intcovar.mat[,rep(1:n.inter, each = ncol(curr.alleles))]
+                    # Create a matrix with the alleles spread out, one per intcovar and multiply
+                    # by intcovars. We'll use this in the interactive model.
+                    cur.int.alleles = cur.alleles[,rep(1:ncol(cur.alleles), n.inter)] * intcovar.mat
+
                     for(j in sdps.to.use) {
 
-                        full.mod = glm(pheno[,pheno.col] ~ addcovar + intcovar * cur.alleles[j,], 
+                        # Null model is different at each marker and includes additive covariates
+                        # and genotype.   
+                        null.mod = glm(pheno[,pheno.col] ~ addcovar + cur.alleles[j,], 
+                                       family = binomial(logit))
+
+                        full.mod = glm(pheno[,pheno.col] ~ addcovar + cur.int.alleles[j,], 
                                        family = binomial(logit))
                         #full.mod = glm(trait ~ addcovar + cur.alleles[j,], family = poisson(link = "log"))
-                        cur.ll[j] = logLik(full.mod)
+                        cur.ll[j] = logLik(full.mod) - logLik(null.mod)
 
                     } # for(j)
                 } # else
-
-                # This is the LRS.
-                cur.ll = cur.ll - null.ll
 
                 # Return the results.
                 cur.ll[m]
@@ -119,6 +136,5 @@ GRSDbinom.fast = function(obj, pheno, pheno.col, addcovar, intcovar, tx, sanger.
 
         # Return the positions and p-values.
         return(pv)
-
 
 } # GRSDbinom.fast()
