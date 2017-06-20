@@ -76,7 +76,6 @@ GRSD.assoc = function(pheno, pheno.col, probs, K, addcovar, intcovar, markers, s
         } # for(i)
 
         rm(probs, K, markers)
-  print(paste("outdir =", outdir))
         setwd(outdir)
 
         # MAPPING ANALYSES #
@@ -84,7 +83,6 @@ GRSD.assoc = function(pheno, pheno.col, probs, K, addcovar, intcovar, markers, s
         result = vector("list", length(data))
         names(result) = names(data)
         print(paste("Mapping with", length(samples), tx, "samples..."))
-        print(paste("sanger.dir = ", sanger.dir))
 
         for(i in 1:19) {
                 print(paste("CHROMOSOME", i))
