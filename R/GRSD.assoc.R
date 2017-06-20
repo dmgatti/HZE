@@ -87,13 +87,15 @@ GRSD.assoc = function(pheno, pheno.col, probs, K, addcovar, intcovar, markers, s
         for(i in 1:19) {
                 print(paste("CHROMOSOME", i))
                 timechr <- Sys.time()
-                result[[i]] = GRSDbinom.fast(data[[i]], pheno, pheno.col, addcovar, tx, sanger.dir)
+                result[[i]] = GRSDbinom.fast(obj = data[[i]], pheno = pheno, pheno.col = pheno.col, addcovar = addcovar,
+                                             intcovar = intcovar, tx = tx, sanger.dir = sanger.dir)
                 print(paste(round(difftime(Sys.time(), timechr, units = 'mins'), digits = 2),
                       "minutes..."))
         } #for(i)
 
         print("X CHROMOSOME")
-        result[["X"]] = GRSDbinom.xchr.fast(data[["X"]], pheno, pheno.col, addcovar, tx, sanger.dir)
+        result[["X"]] = GRSDbinom.xchr.fast(obj = data[["X"]], pheno = pheno, pheno.col = pheno.col, addcovar = addcovar,
+                                            intcovar = intcovar, tx = tx, sanger.dir = sanger.dir)
 
         print(paste(round(difftime(Sys.time(), begin, units = 'hours'), digits = 2),
                     "hours elapsed during mapping."))
