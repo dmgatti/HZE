@@ -123,9 +123,9 @@ GRSDbinom.fast = function(obj, pheno, pheno.col, addcovar, intcovar, tx, sanger.
 
         # Convert LRS to p-values using the chi-squared distribution.
         df = ncol(addcovar)
-        if(!missing(intcovar)) {
+        if(!is.null(intcovar)) {
             df = ncol(addcovar) + ncol(intcovar) * ncol(obj$probs)
-        } # if(!missing(intcovar))
+        } # if(!is.null(intcovar))
         pv = pchisq(2 * pv, df = df, lower.tail = FALSE)
         pv = data.frame(sanger.hdr, pv, stringsAsFactors = FALSE)
 
