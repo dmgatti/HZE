@@ -23,7 +23,7 @@ GRSDbinom.fast = function(obj, pheno, pheno.col, addcovar, intcovar, tx, sanger.
         
         # Set intcovar = null if it is missing so that the glm.fxn can check whether it equals null.
         if(missing(intcovar)) {
-            intcovar = null
+            intcovar = NULL
         } # if(missing(intcovar))
 
         glm.fxn = function(snp.rng, local.probs) {
