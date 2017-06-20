@@ -68,9 +68,6 @@ GRSD.assoc = function(pheno, pheno.col, probs, K, addcovar, markers, snp.file,
         } # for(i)
 
         rm(probs, K, markers)
-
-        setwd(outdir)
-
         setwd(outdir)
 
         # MAPPING ANALYSES #
@@ -104,8 +101,6 @@ GRSD.assoc = function(pheno, pheno.col, probs, K, addcovar, markers, snp.file,
                                     ranges = IRanges(start = result[[i]]$POS, width = 1),
                                     p.value = result[[i]]$pv)
         } # for(i)
-
-
 
         # PLOTTING
         plotter <- Sys.time()
