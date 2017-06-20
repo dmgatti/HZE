@@ -84,7 +84,7 @@ GRSD.assoc = function(pheno, pheno.col, probs, K, addcovar, intcovar, markers, s
         result = vector("list", length(data))
         names(result) = names(data)
         print(paste("Mapping with", length(samples), tx, "samples..."))
-        sanger.dir = sanger.dir
+        print(paste("sanger.dir = ", sanger.dir))
 
         for(i in 1:19) {
                 print(paste("CHROMOSOME", i))
