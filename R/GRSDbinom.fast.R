@@ -7,8 +7,6 @@
 GRSDbinom.fast = function(obj, pheno, pheno.col, addcovar, intcovar, tx, sanger.dir = "~/Desktop/R/QTL/WD/HS.sanger.files/") {
         chr = obj$markers[1,2]
 
-        setwd(outdir)
-
         file.prefix = paste(tx, pheno.col, sep = "_")
 
         plot.title = paste(tx, pheno.col, sep = " ")
