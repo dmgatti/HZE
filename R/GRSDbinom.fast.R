@@ -20,6 +20,11 @@ GRSDbinom.fast = function(obj, pheno, pheno.col, addcovar, intcovar, tx, sanger.
         #null.mod = glm(trait ~ addcovar, family = poisson(link = "log"))
         null.ll = logLik(null.mod)
         pv = rep(0, nrow(sanger))
+        
+        # Set intcovar = null if it is missing so that the glm.fxn can check whether it equals null.
+        if(missing(intcovar)) {
+            intcovar = null
+        } # if(missing(intcovar))
 
         glm.fxn = function(snp.rng, local.probs) {
 
@@ -40,7 +45,7 @@ GRSDbinom.fast = function(obj, pheno, pheno.col, addcovar, intcovar, tx, sanger.
 
                 # Run the model at each unique SDP.
                 # Additive model.
-                if(missing(intcovar)) {
+                if(is.null(intcovar)) {
 
                     for(j in sdps.to.use) {
 
