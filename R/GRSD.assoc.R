@@ -76,6 +76,7 @@ GRSD.assoc = function(pheno, pheno.col, probs, K, addcovar, intcovar, markers, s
         } # for(i)
 
         rm(probs, K, markers)
+  print(paste("outdir =", outdir))
         setwd(outdir)
 
         # MAPPING ANALYSES #
