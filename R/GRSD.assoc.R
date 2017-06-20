@@ -12,7 +12,7 @@
 #' @param K: List of kinship matrices, one per chromosome in markers.
 #' @param addcovar: data.frame of additive covariates to use in the mapping.
 #'                      Sample IDs must be in rownames.
-#' @param addcovar: data.frame of interactive covariate to use in the mapping.
+#' @param intcovar: data.frame of interactive covariate to use in the mapping.
 #'                  This will add a term for covariate X genotype interaction to the 
 #'                  mapping model. Sample IDs must be in rownames.
 #' @param markers: data.frame containing at least 3 columns with marker names,
